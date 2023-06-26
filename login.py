@@ -78,7 +78,7 @@ class CarLogin(object):
                 img.write(requests.get(url_image).content)
 
             result = self.ocr.ocr("image.png", cls=True)
-            captcha_str = result[0][1][0].strip() if len(result)>0 else ""
+            captcha_str = result[0][0][1][0].strip() if len(result)>0 else ""
             print("OCR识别验证码: {}".format(captcha_str))
 
             form_data = {
