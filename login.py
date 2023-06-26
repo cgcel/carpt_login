@@ -66,30 +66,33 @@ class CarLogin(object):
     def login(self):
         """登录函数
         """
-        r = self.session.get(url_login_get)
+        try:
+            r = self.session.get(url_login_get)
 
-        pattern = re.compile(r'imagehash=(.*?)&amp;secret="')
-        image_hash = pattern.findall(r.text)[0]
+            pattern = re.compile(r'imagehash=(.*?)&amp;secret="')
+            image_hash = pattern.findall(r.text)[0]
 
-        url_image = url_img.format(image_hash)
+            url_image = url_img.format(image_hash)
 
-        with open("image.png", "wb") as img:
-            img.write(requests.get(url_image).content)
+            with open("image.png", "wb") as img:
+                img.write(requests.get(url_image).content)
 
-        result = self.ocr.ocr("image.png", cls=True)
-        captcha_str = result[0][1][0].strip() if len(result)>0 else ""
-        print("OCR识别验证码: {}".format(captcha_str))
+            result = self.ocr.ocr("image.png", cls=True)
+            captcha_str = result[0][1][0].strip() if len(result)>0 else ""
+            print("OCR识别验证码: {}".format(captcha_str))
 
-        form_data = {
-            'username': self.username,
-            'password': self.password,
-            'two_step_code': '',
-            'imagestring': captcha_str,
-            'imagehash': image_hash
-        }
+            form_data = {
+                'username': self.username,
+                'password': self.password,
+                'two_step_code': '',
+                'imagestring': captcha_str,
+                'imagehash': image_hash
+            }
 
-        self.session.post(url_login_post, data=form_data)
-        r = self.session.get(url_index)
+            self.session.post(url_login_post, data=form_data)
+            r = self.session.get(url_index)
+        except:
+            return
         try:
             if len(re.findall('欢迎回来', r.text)) == 1:
                 self.flag = True
